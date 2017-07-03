@@ -1,0 +1,32 @@
+{
+  "name": "archol-dev-server",
+  "version": "1.0.0",
+  "description": "archol-dev-server",
+  "bin": "bin/server.js",
+  "main": "bin/api.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "run": "node bin/server",
+    "dev": "npm run build & npm run run",
+    "watch": "tsc -p . -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/archol/archol-dev-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/archol/archol-dev-server/issues"
+  },
+  "homepage": "https://github.com/archol/archol-dev-server#readme",
+  "dependencies": {
+    "express": "^4.15.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.0.36",
+    "@types/node": "^8.0.7",
+    "typescript": "^2.4.1"
+  }
+}
