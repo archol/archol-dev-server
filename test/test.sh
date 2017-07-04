@@ -4,6 +4,10 @@ cd `dirname $0`
 cd ..
 pwd
 
+function mocha() {
+  node_modules/mocha/bin/mocha
+}
+
 function nyc() {
   node_modules/.bin/nyc node_modules/mocha/bin/mocha
   node_modules/.bin/nyc report --reporter=json
@@ -22,7 +26,7 @@ function coveralls() {
 
 CMD="$1"
 
-[ -z "$1" ] && CMD="node_modules/mocha/bin/mocha"
+[ -z "$1" ] && CMD="nyc"
 
 tsc -p . 
 [ $? -eq 0 ] && $CMD

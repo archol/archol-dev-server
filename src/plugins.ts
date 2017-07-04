@@ -8,7 +8,7 @@ export const defaultPlugins: Plugin[] = [
                 res.write(new Date().toISOString());
                 res.write('\r\n');
                 res.write('\r\n');
-                req.pipe(res);
+                req.pipe(res);                
             }
         }
     }

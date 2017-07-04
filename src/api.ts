@@ -7,6 +7,7 @@ import { defaultPlugins } from './plugins';
 
 const app = express();
 const server = http.createServer(app);
+let listening = false;
 
 export type Plugin = {
     handlers: {
@@ -20,10 +21,9 @@ let config: {
 };
 
 export function registerPlugin(plugin: Plugin) {
-    if (plugins)
-        plugins.push(plugin);
-    else
+    if (listening)
         throw new Error('Server yet started');
+    plugins.push(plugin);    
 }
 
 export function loadPlugins() {
@@ -42,17 +42,22 @@ export function loadPlugin(plugin: Plugin) {
 }
 
 export function startServer(callback?: () => void) {
-    server.listen(config.port, function listening() {
+    server.listen(config.port, () => {
+        listening = true;
         console.log('Listening on %d', server.address().port);
         callback && callback();
     });
 }
 
 export function stopServer(callback?: () => void) {
-    server.close(callback);
+    server.close(() => {
+        listening = false;
+        callback && callback();
+    });
 }
 
 export function loadConfig(dir: string) {
+    dir = path.resolve(dir);
     let packageJson = path.join(dir, 'package.json')
     if (!fs.existsSync(packageJson)) {
         console.error(packageJson + ' not found in current directory');
@@ -65,6 +70,13 @@ export function loadConfig(dir: string) {
         console.error('archol-dev-server not found in ' + packageJson);
         return false;
     }
+    if (!(config.plugins && Array.isArray(config.plugins))) {
+        console.error('archol-dev-server.plugins must be an array in ' + packageJson);
+        return false;
+    }
+    config.plugins.forEach(function (p) {
+        require(path.resolve(path.join(dir, p)));
+    });
     return true;
 }
 

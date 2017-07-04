@@ -18,8 +18,8 @@
             "type": "node",
             "request": "launch",
             "name": "run tests",
-            "program": "${workspaceRoot}/tests/node_modules/mocha/bin/_mocha",
-            "cwd": "${workspaceRoot}/tests"
+            "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+            "cwd": "${workspaceRoot}"
         }
     ]
 }

@@ -23,6 +23,26 @@ describe('archol-dev-server-tests', function () {
             done();
         });
     });
+
+    it('echo', function (done) {
+        httpGet('http://localhost:54321/~sample/echo?s=123', function (err, res) {
+            if (err)
+                assert.fail(err);
+            assert.equal(res, '123');
+            done();
+        });
+    });
+
+    it('try registerPlugin after startServer', function (done) {
+        try {
+          api.registerPlugin({});
+          assert.fail('registerPlugin must fail')
+          done();
+        }
+        catch(err) {
+            done();
+        }
+    });
 });
 
 describe('archol-dev-server-tests', function () {    
@@ -31,8 +51,11 @@ describe('archol-dev-server-tests', function () {
           assert.fail('must fail');
     });
     it('invalid package.json', function () {
-        debugger
-        if (api.loadConfig(__dirname+'/invalid'))
+        if (api.loadConfig(__dirname+'/invalid/1'))
+          assert.fail('must fail');
+    });
+    it('invalid plugins in package.json', function () {
+        if (api.loadConfig(__dirname+'/invalid/2'))
           assert.fail('must fail');
     });
 });
