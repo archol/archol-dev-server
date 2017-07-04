@@ -40,14 +40,14 @@ export function loadPlugin(plugin: Plugin) {
     }
 }
 
-export function startServer(callback: () => void) {
+export function startServer(callback: () => void = null) {
     server.listen(config.port, function listening() {
         console.log('Listening on %d', server.address().port);
         callback && callback();
     });
 }
 
-export function stopServer(callback: () => void) {
+export function stopServer(callback: () => void = null) {
     server.close(callback);
 }
 

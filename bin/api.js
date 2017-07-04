@@ -31,6 +31,7 @@ function loadPlugin(plugin) {
 }
 exports.loadPlugin = loadPlugin;
 function startServer(callback) {
+    if (callback === void 0) { callback = null; }
     server.listen(config.port, function listening() {
         console.log('Listening on %d', server.address().port);
         callback && callback();
@@ -38,6 +39,7 @@ function startServer(callback) {
 }
 exports.startServer = startServer;
 function stopServer(callback) {
+    if (callback === void 0) { callback = null; }
     server.close(callback);
 }
 exports.stopServer = stopServer;

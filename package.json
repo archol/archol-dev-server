@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -p .",
     "run": "node bin/server",
-    "dev": "npm run build & npm run run",
+    "dev": "npm run build && npm run run",
     "watch": "tsc -p . -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
