@@ -5,7 +5,9 @@ import path = require('path');
 import url = require('url');
 import { warn } from './logger';
 import es = require("event-stream");
-import send = require('send');
+var send = require('send');
+
+// from https://github.com/tapio/live-server
 
 let INJECTED_CODE = '';
 

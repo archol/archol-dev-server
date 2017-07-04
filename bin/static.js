@@ -5,7 +5,8 @@ var path = require("path");
 var url = require("url");
 var logger_1 = require("./logger");
 var es = require("event-stream");
-var send = require("send");
+var send = require('send');
+// from https://github.com/tapio/live-server
 var INJECTED_CODE = '';
 function appendInjetion(script) {
     INJECTED_CODE = [
