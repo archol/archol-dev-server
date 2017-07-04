@@ -9,7 +9,7 @@
     "run": "node bin/server",
     "dev": "npm run build && npm run run",
     "watch": "tsc -p . -w",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "test/test.sh"
   },
   "repository": {
     "type": "git",
