@@ -1,0 +1,9 @@
+machine:
+  node:
+    version: 6.9.5
+  npm:
+    version: 5.0.4
+
+test:
+  override:
+    - test/test.sh codecov
