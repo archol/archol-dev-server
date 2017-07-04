@@ -2,7 +2,9 @@
 
 cd `dirname $0`
 cd ..
-pwd
+echo "root: `pwd`"
+echo "node: `node --version`"
+echo "npm: `npm --version`"
 
 function mocha() {
   node_modules/mocha/bin/mocha
