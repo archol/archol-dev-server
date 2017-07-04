@@ -10,14 +10,14 @@ function mocha() {
 
 function nyc() {
   node_modules/.bin/nyc node_modules/mocha/bin/mocha
-  node_modules/.bin/nyc report --reporter=json
-  node_modules/.bin/nyc report --reporter=html
+  [ $? -eq 0 ] && node_modules/.bin/nyc report --reporter=json
+  [ $? -eq 0 ] && node_modules/.bin/nyc report --reporter=html
 }
 
 function codecov() {
   node_modules/.bin/nyc node_modules/mocha/bin/mocha
-  node_modules/.bin/nyc report --reporter=json
-  node_modules/.bin/codecov -f coverage/*.json -t $CODECON_TOKEN
+  [ $? -eq 0 ] && node_modules/.bin/nyc report --reporter=json
+  [ $? -eq 0 ] && node_modules/.bin/codecov -f coverage/*.json -t $CODECON_TOKEN
 }
 
 function coveralls() {
