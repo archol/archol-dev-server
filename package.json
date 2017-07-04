@@ -28,5 +28,11 @@
     "@types/express": "^4.0.36",
     "@types/node": "^8.0.7",
     "typescript": "^2.4.1"
+  },
+  "archol-dev-server":{
+     "port": 31234,
+     "plugins": [
+
+     ]
   }
 }

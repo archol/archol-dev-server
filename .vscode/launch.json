@@ -7,12 +7,19 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "start server",
             "program": "${workspaceRoot}/bin/server.js",
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceRoot}/bin/server.js"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "run tests",
+            "program": "${workspaceRoot}/tests/node_modules/mocha/bin/_mocha",
+            "cwd": "${workspaceRoot}/tests"
         }
     ]
 }
