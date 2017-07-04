@@ -76,7 +76,7 @@ export function serveStatic(wwwroot: string, fsroot: string) {
                 var len = INJECTED_CODE.length + Number.parseInt(res.getHeader('Content-Length') as any);
                 res.setHeader('Content-Length', len.toString());
                 var originalPipe = stream.pipe;
-                stream.pipe = function (resp: NodeJS.WritableStream) {
+                stream.pipe = function (resp: any) {
                     originalPipe.call(stream, es.replace(new RegExp(injectTag, "i"), INJECTED_CODE + injectTag)).pipe(resp);
                 };
             }
