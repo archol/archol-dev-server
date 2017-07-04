@@ -17,7 +17,7 @@ function nyc() {
 function codecov() {
   node_modules/.bin/nyc node_modules/mocha/bin/mocha
   [ $? -eq 0 ] && node_modules/.bin/nyc report --reporter=json
-  [ $? -eq 0 ] && node_modules/.bin/codecov -f coverage/*.json -t $CODECON_TOKEN
+  [ $? -eq 0 ] && node_modules/.bin/codecov -f coverage/*.json -t "$CODECOV_TOKEN"
 }
 
 function coveralls() {
