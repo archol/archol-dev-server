@@ -5,13 +5,13 @@ var assert = require('assert'),
 describe('archol-dev-server-tests', function () {    
 
     before(function (done) {
-        api.loadConfig();
+        api.loadConfig(__dirname+'/sample');
         api.loadPlugins();
         api.startServer(done);
     });
 
-    after(function () {
-        api.stopServer();
+    after(function (done) {
+        api.stopServer(done);
     });
 
     it('ping', function (done) {
@@ -22,6 +22,18 @@ describe('archol-dev-server-tests', function () {
                 assert.fail('invalid content: ' + res);
             done();
         });
+    });
+});
+
+describe('archol-dev-server-tests', function () {    
+    it('with out package.json', function () {
+        if (api.loadConfig(__dirname+'/../bin'))
+          assert.fail('must fail');
+    });
+    it('invalid package.json', function () {
+        debugger
+        if (api.loadConfig(__dirname+'/invalid'))
+          assert.fail('must fail');
     });
 });
 

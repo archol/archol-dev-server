@@ -2,7 +2,8 @@
 import { loadConfig, loadPlugins, startServer } from './api';
 
 setTimeout(() => {
-    loadConfig();
-    loadPlugins();
-    startServer();
+    if (loadConfig(process.cwd())) {
+        loadPlugins();
+        startServer();
+    }
 }, 500);

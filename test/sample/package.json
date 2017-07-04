@@ -11,8 +11,5 @@
   "archol-dev-server": {
     "port": 54321,
     "plugins": []
-  },
-  "devDependencies": {
-    "mocha": "^3.4.2"
   }
 }

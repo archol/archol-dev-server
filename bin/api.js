@@ -3,6 +3,7 @@ exports.__esModule = true;
 var express = require("express");
 var http = require("http");
 var fs = require("fs");
+var path = require("path");
 var plugins_1 = require("./plugins");
 var app = express();
 var server = http.createServer(app);
@@ -31,7 +32,6 @@ function loadPlugin(plugin) {
 }
 exports.loadPlugin = loadPlugin;
 function startServer(callback) {
-    if (callback === void 0) { callback = null; }
     server.listen(config.port, function listening() {
         console.log('Listening on %d', server.address().port);
         callback && callback();
@@ -39,21 +39,23 @@ function startServer(callback) {
 }
 exports.startServer = startServer;
 function stopServer(callback) {
-    if (callback === void 0) { callback = null; }
     server.close(callback);
 }
 exports.stopServer = stopServer;
-function loadConfig() {
-    if (!fs.existsSync('package.json')) {
-        console.error('package.json not found in current directory');
-        process.exit(1);
+function loadConfig(dir) {
+    var packageJson = path.join(dir, 'package.json');
+    if (!fs.existsSync(packageJson)) {
+        console.error(packageJson + ' not found in current directory');
+        return false;
     }
-    var text = fs.readFileSync('package.json', 'utf-8');
+    var text = fs.readFileSync(packageJson, 'utf-8');
     var json = JSON.parse(text);
     config = json['archol-dev-server'];
     if (!config) {
-        console.error('archol-dev-server not found in package.json');
-        process.exit(2);
+        console.error('archol-dev-server not found in ' + packageJson);
+        return false;
     }
+    return true;
 }
 exports.loadConfig = loadConfig;
+//# sourceMappingURL=api.js.map

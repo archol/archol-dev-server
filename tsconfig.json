@@ -1,14 +1,15 @@
 {
     "compilerOptions": {
         "noImplicitAny": true,
-        "removeComments": true,
+        "removeComments": false,
         "noImplicitThis": true,
         "noImplicitReturns": true,
         "outDir": "./bin",
         "lib": [
             "es2015",
             "es2016"
-        ]
+        ],
+        "sourceMap": true
     },
     "include": [
         "src/*.ts"

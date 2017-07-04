@@ -2,6 +2,7 @@
 import express = require('express');
 import http = require('http');
 import fs = require('fs');
+import path = require('path');
 import { defaultPlugins } from './plugins';
 
 const app = express();
@@ -40,28 +41,30 @@ export function loadPlugin(plugin: Plugin) {
     }
 }
 
-export function startServer(callback: () => void = null) {
+export function startServer(callback?: () => void) {
     server.listen(config.port, function listening() {
         console.log('Listening on %d', server.address().port);
         callback && callback();
     });
 }
 
-export function stopServer(callback: () => void = null) {
+export function stopServer(callback?: () => void) {
     server.close(callback);
 }
 
-export function loadConfig() {
-    if (!fs.existsSync('package.json')) {
-        console.error('package.json not found in current directory');
-        process.exit(1);
+export function loadConfig(dir: string) {
+    let packageJson = path.join(dir, 'package.json')
+    if (!fs.existsSync(packageJson)) {
+        console.error(packageJson + ' not found in current directory');
+        return false;
     }
-    let text = fs.readFileSync('package.json', 'utf-8');
+    let text = fs.readFileSync(packageJson, 'utf-8');
     let json = JSON.parse(text);
     config = json['archol-dev-server'];
     if (!config) {
-        console.error('archol-dev-server not found in package.json');
-        process.exit(2);
+        console.error('archol-dev-server not found in ' + packageJson);
+        return false;
     }
+    return true;
 }
 
