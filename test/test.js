@@ -6,7 +6,6 @@ describe('archol-dev-server-tests', function () {
 
     before(function (done) {
         api.loadConfig(__dirname+'/sample');
-        api.loadPlugins();
         api.startServer(done);
     });
 
@@ -29,6 +28,15 @@ describe('archol-dev-server-tests', function () {
             if (err)
                 assert.fail(err);
             assert.equal(res, '123');
+            done();
+        });
+    });
+
+    it('html with injected code', function (done) {
+        httpGet('http://localhost:54321/~samplesite/index.html', function (err, res) {
+            if (err)
+                assert.fail(err);
+            assert.equal(res, '<html><body>ok<script src="~samplesite/index.js"></script></body></html>');
             done();
         });
     });

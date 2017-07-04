@@ -10,7 +10,8 @@ exports.defaultPlugins = [
                 res.write('\r\n');
                 req.pipe(res);
             },
-            _a)
+            _a),
+        injections: []
     }
 ];
 var _a;

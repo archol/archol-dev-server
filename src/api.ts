@@ -4,39 +4,51 @@ import http = require('http');
 import fs = require('fs');
 import path = require('path');
 import { defaultPlugins } from './plugins';
+import { appendInjetion, serveStatic } from './static';
+import { serverLog, serverError } from './logger';
 
 const app = express();
 const server = http.createServer(app);
 let listening = false;
 
+export type Middleware = (req: express.Request, res: express.Response, next: express.NextFunction) => any
+export type StaticFolder = string;
+
 export type Plugin = {
     handlers: {
-        [path: string]: (req: express.Request, res: express.Response, next: express.NextFunction) => any
-    }
+        [path: string]: Middleware | StaticFolder
+    },
+    injections: string[]
 };
-const plugins: Array<Plugin> = defaultPlugins;
+
 let config: {
     port: number
     plugins: string[]
 };
 
+defaultPlugins.forEach(registerPlugin);
+
 export function registerPlugin(plugin: Plugin) {
     if (listening)
         throw new Error('Server yet started');
-    plugins.push(plugin);    
-}
-
-export function loadPlugins() {
-    plugins.forEach(p => {
-        loadPlugin(p);
-    })
+    loadPlugin(plugin);
 }
 
 export function loadPlugin(plugin: Plugin) {
     initHandlers();
+    initInjections();
     function initHandlers() {
         Object.keys(plugin.handlers).forEach(path => {
-            app.use(path, plugin.handlers[path]);
+            const h = plugin.handlers[path];
+            if (typeof h === 'function')
+                app.use(path, h);
+            if (typeof h === 'string')
+                app.use(path, serveStatic(path, h));
+        })
+    }
+    function initInjections() {
+        plugin.injections.forEach(script => {
+            appendInjetion(script);
         })
     }
 }
@@ -44,7 +56,7 @@ export function loadPlugin(plugin: Plugin) {
 export function startServer(callback?: () => void) {
     server.listen(config.port, () => {
         listening = true;
-        console.log('Listening on %d', server.address().port);
+        serverLog('Listening on http://localhost:%d/', server.address().port);
         callback && callback();
     });
 }
@@ -60,18 +72,18 @@ export function loadConfig(dir: string) {
     dir = path.resolve(dir);
     let packageJson = path.join(dir, 'package.json')
     if (!fs.existsSync(packageJson)) {
-        console.error(packageJson + ' not found in current directory');
+        serverError(packageJson + ' not found in current directory');
         return false;
     }
     let text = fs.readFileSync(packageJson, 'utf-8');
     let json = JSON.parse(text);
     config = json['archol-dev-server'];
     if (!config) {
-        console.error('archol-dev-server not found in ' + packageJson);
+        serverError('archol-dev-server not found in ' + packageJson);
         return false;
     }
     if (!(config.plugins && Array.isArray(config.plugins))) {
-        console.error('archol-dev-server.plugins must be an array in ' + packageJson);
+        serverError('archol-dev-server.plugins must be an array in ' + packageJson);
         return false;
     }
     config.plugins.forEach(function (p) {
@@ -79,4 +91,3 @@ export function loadConfig(dir: string) {
     });
     return true;
 }
-
