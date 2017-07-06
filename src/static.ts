@@ -73,46 +73,58 @@ function sendResponse(data: IStaticData, req: express.Request, res: express.Resp
             // if (err.status === 404) return next();
             // next(err);
         })
-        .on("directory", () => {
-            res.statusCode = 301;
-            const to = data.wwwroot + data.pathname + "/index.html";
-            res.setHeader("Location", to);
-            res.end("Redirecting to " + escape(to));
-        })
-        .on("file", (filepath: string /*, stat*/) => {
-            const x = path.extname(filepath).toLocaleLowerCase();
-            let match;
-            const possibleExtensions = ["", ".html", ".htm", ".xhtml", ".php", ".svg"];
-            if (!(data.hasNoOrigin && (possibleExtensions.indexOf(x) > -1))) {
-                return;
-            }
-            const contents = fs.readFileSync(filepath, "utf8");
-            for (const c of injectCandidates) {
-                match = c.exec(contents);
-                if (match) {
-                    data.injectTag = match[0];
-                    break;
-                }
-            }
-            if (data.injectTag === null) {
-                warn("Failed to inject refresh script!",
-                    "Couldn't find any of the tags ", injectCandidates, "from", filepath);
-            }
-        })
-        .on("stream", (stream: any) => {
-            if (data.injectTag) {
-                const len = INJECTED_CODE.length + Number.parseInt(res.getHeader("Content-Length") as any);
-                res.setHeader("Content-Length", len.toString());
-                const originalPipe = stream.pipe;
-                stream.pipe = (resp: any) => {
-                    originalPipe.call(stream,
-                        es.replace(new RegExp(data.injectTag, "i"),
-                            INJECTED_CODE + data.injectTag))
-                        .pipe(resp);
-                };
-            }
-        })
+        .on("directory", directoryResponse(data, res))
+        .on("file", fileResponse(data))
+        .on("stream", injections(data, res))
         .pipe(res);
+}
+
+function directoryResponse(data: IStaticData, res: express.Response) {
+    return () => {
+        res.statusCode = 301;
+        const to = data.wwwroot + data.pathname + "/index.html";
+        res.setHeader("Location", to);
+        res.end("Redirecting to " + escape(to));
+    };
+}
+
+function fileResponse(data: IStaticData) {
+    return (filepath: string /*, stat*/) => {
+        const x = path.extname(filepath).toLocaleLowerCase();
+        let match;
+        const possibleExtensions = ["", ".html", ".htm", ".xhtml", ".php", ".svg"];
+        if (!(data.hasNoOrigin && (possibleExtensions.indexOf(x) > -1))) {
+            return;
+        }
+        const contents = fs.readFileSync(filepath, "utf8");
+        for (const c of injectCandidates) {
+            match = c.exec(contents);
+            if (match) {
+                data.injectTag = match[0];
+                break;
+            }
+        }
+        if (data.injectTag === null) {
+            warn("Failed to inject refresh script!",
+                "Couldn't find any of the tags ", injectCandidates, "from", filepath);
+        }
+    };
+}
+
+function injections(data: IStaticData, res: express.Response) {
+    return (stream: any) => {
+        if (data.injectTag) {
+            const len = INJECTED_CODE.length + Number.parseInt(res.getHeader("Content-Length") as any);
+            res.setHeader("Content-Length", len.toString());
+            const originalPipe = stream.pipe;
+            stream.pipe = (resp: any) => {
+                originalPipe.call(stream,
+                    es.replace(new RegExp(data.injectTag, "i"),
+                        INJECTED_CODE + data.injectTag))
+                    .pipe(resp);
+            };
+        }
+    };
 }
 
 function escape(html: string) {

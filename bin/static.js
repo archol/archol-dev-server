@@ -55,13 +55,21 @@ function sendResponse(data, req, res, next) {
         // if (err.status === 404) return next();
         // next(err);
     })
-        .on("directory", function () {
+        .on("directory", directoryResponse(data, res))
+        .on("file", fileResponse(data))
+        .on("stream", injections(data, res))
+        .pipe(res);
+}
+function directoryResponse(data, res) {
+    return function () {
         res.statusCode = 301;
         var to = data.wwwroot + data.pathname + "/index.html";
         res.setHeader("Location", to);
         res.end("Redirecting to " + escape(to));
-    })
-        .on("file", function (filepath /*, stat*/) {
+    };
+}
+function fileResponse(data) {
+    return function (filepath /*, stat*/) {
         var x = path.extname(filepath).toLocaleLowerCase();
         var match;
         var possibleExtensions = ["", ".html", ".htm", ".xhtml", ".php", ".svg"];
@@ -80,8 +88,10 @@ function sendResponse(data, req, res, next) {
         if (data.injectTag === null) {
             logger_1.warn("Failed to inject refresh script!", "Couldn't find any of the tags ", injectCandidates, "from", filepath);
         }
-    })
-        .on("stream", function (stream) {
+    };
+}
+function injections(data, res) {
+    return function (stream) {
         if (data.injectTag) {
             var len = INJECTED_CODE.length + Number.parseInt(res.getHeader("Content-Length"));
             res.setHeader("Content-Length", len.toString());
@@ -91,8 +101,7 @@ function sendResponse(data, req, res, next) {
                     .pipe(resp);
             };
         }
-    })
-        .pipe(res);
+    };
 }
 function escape(html) {
     return String(html)
