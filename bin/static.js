@@ -18,20 +18,14 @@ function appendInjetion(script) {
 }
 exports.appendInjetion = appendInjetion;
 function serveStatic(wwwroot, fsroot) {
+    if (wwwroot[wwwroot.length - 1] !== '/')
+        wwwroot += '/';
     fsroot = path.resolve(fsroot);
-    var isFile = false;
-    try {
-        isFile = fs.statSync(fsroot).isFile();
-    }
-    catch (e) {
-        if (e.code !== "ENOENT")
-            throw e;
-    }
+    var isFile = fs.statSync(fsroot).isFile();
     return function (req, res, next) {
         if (req.method !== "GET" && req.method !== "HEAD")
             return next();
         var pathname = url.parse(req.originalUrl).pathname;
-        debugger;
         if (pathname.substr(0, wwwroot.length) !== wwwroot)
             return next();
         pathname = pathname.substr(wwwroot.length);
@@ -40,14 +34,12 @@ function serveStatic(wwwroot, fsroot) {
         var injectCandidates = [new RegExp("</body>", "i"), new RegExp("</svg>"), new RegExp("</head>", "i")];
         var injectTag = null;
         function directory() {
-            debugger;
-            file(pathname + '/index.html');
-            // res.statusCode = 301;
-            // res.setHeader('Location', pathname + '/');
-            // res.end('Redirecting to ' + escape(pathname) + '/');
+            res.statusCode = 301;
+            var to = wwwroot + (pathname ? pathname + '/' : '') + 'index.html';
+            res.setHeader('Location', to);
+            res.end('Redirecting to ' + escape(to));
         }
         function file(filepath /*, stat*/) {
-            debugger;
             var x = path.extname(filepath).toLocaleLowerCase(), match, possibleExtensions = ["", ".html", ".htm", ".xhtml", ".php", ".svg"];
             if (hasNoOrigin && (possibleExtensions.indexOf(x) > -1)) {
                 var contents = fs.readFileSync(filepath, "utf8");
@@ -64,9 +56,9 @@ function serveStatic(wwwroot, fsroot) {
             }
         }
         function error(err) {
-            if (err.status === 404)
-                return next();
-            next(err);
+            next();
+            // if (err.status === 404) return next();
+            // next(err);
         }
         function inject(stream) {
             if (injectTag) {

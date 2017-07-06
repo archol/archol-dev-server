@@ -56,9 +56,13 @@ export function loadPlugin(plugin: Plugin) {
 export function startServer(callback?: () => void) {
     server.listen(config.port, () => {
         listening = true;
-        serverLog('Listening on http://localhost:%d/', server.address().port);
+        serverLog('Listening on http://localhost:', server.address().port, '/');
         callback && callback();
     });
+}
+ 
+export function serverLink(path: string) {
+  return ['http://localhost:', config.port, path || '/'].join('');
 }
 
 export function stopServer(callback?: () => void) {

@@ -20,34 +20,31 @@ export function appendInjetion(script: string) {
     ].join('');
 }
 export function serveStatic(wwwroot: string, fsroot: string) {
+    if (wwwroot[wwwroot.length-1]!=='/')
+      wwwroot+='/';
     fsroot = path.resolve(fsroot);
-    var isFile = false;
-    try {
-        isFile = fs.statSync(fsroot).isFile();
-    } catch (e) {
-        if (e.code !== "ENOENT") throw e;
-    }
+    debugger
+    var isFile = fs.statSync(fsroot).isFile();
     return function (req: express.Request, res: express.Response, next: express.NextFunction) {
-        if (req.method !== "GET" && req.method !== "HEAD") return next();
-        let pathname = url.parse(req.originalUrl).pathname;
         debugger
+        if (req.method !== "GET" && req.method !== "HEAD") return next();
+        let pathname = url.parse(req.originalUrl).pathname;        
         if (pathname.substr(0, wwwroot.length) !== wwwroot) return next();
+
         pathname = pathname.substr(wwwroot.length);
         let reqpath = isFile ? "" : pathname;
         var hasNoOrigin = !req.headers.origin;
         var injectCandidates = [new RegExp("</body>", "i"), new RegExp("</svg>"), new RegExp("</head>", "i")];
         var injectTag: string = null;
 
-        function directory() {
-            debugger
-            file(pathname + '/index.html');
-            // res.statusCode = 301;
-            // res.setHeader('Location', pathname + '/');
-            // res.end('Redirecting to ' + escape(pathname) + '/');
+        function directory() {  
+            res.statusCode = 301;
+            const to=wwwroot + (pathname ? pathname + '/' : '')+ 'index.html';
+            res.setHeader('Location', to);
+            res.end('Redirecting to ' + escape(to));
         }
 
-        function file(filepath: string /*, stat*/) {
-            debugger
+        function file(filepath: string /*, stat*/) {  
             var x = path.extname(filepath).toLocaleLowerCase(), match,
                 possibleExtensions = ["", ".html", ".htm", ".xhtml", ".php", ".svg"];
             if (hasNoOrigin && (possibleExtensions.indexOf(x) > -1)) {
@@ -67,8 +64,9 @@ export function serveStatic(wwwroot: string, fsroot: string) {
         }
 
         function error(err: any) {
-            if (err.status === 404) return next();
-            next(err);
+            next();
+            // if (err.status === 404) return next();
+            // next(err);
         }
 
         function inject(stream: NodeJS.ReadWriteStream) {

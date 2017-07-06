@@ -4,6 +4,8 @@
         "removeComments": false,
         "noImplicitThis": true,
         "noImplicitReturns": true,
+        "declaration": true,
+        "module": "commonjs",
         "outDir": "./bin",
         "lib": [
             "es2015",

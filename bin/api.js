@@ -40,11 +40,15 @@ exports.loadPlugin = loadPlugin;
 function startServer(callback) {
     server.listen(config.port, function () {
         listening = true;
-        logger_1.serverLog('Listening on http://localhost:%d/', server.address().port);
+        logger_1.serverLog('Listening on http://localhost:', server.address().port, '/');
         callback && callback();
     });
 }
 exports.startServer = startServer;
+function serverLink(path) {
+    return ['http://localhost:', config.port, path || '/'].join('');
+}
+exports.serverLink = serverLink;
 function stopServer(callback) {
     server.close(function () {
         listening = false;

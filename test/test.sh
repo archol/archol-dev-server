@@ -2,9 +2,7 @@
 
 cd `dirname $0`
 cd ..
-echo "root: `pwd`"
-echo "node: `node --version`"
-echo "npm: `npm --version`"
+echo "node: `node --version` npm: `npm --version` root: `pwd`"
 
 function mocha() {
   node_modules/mocha/bin/mocha
@@ -33,6 +31,11 @@ CMD="$1"
 
 [ -z "$1" ] && CMD="nyc"
 
+rm -Rf ~/bin
+rm -Rf ~/coverage
+rm -Rf ~/.nyc_output
+
 tsc -p . 
+[ $? -eq 0 ] && tsc --sourceMap test/*.ts 
 [ $? -eq 0 ] && $CMD
 exit $?

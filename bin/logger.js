@@ -1,13 +1,8 @@
+// export function log(...args: any[]) {
+//     console.log.apply(console, args)
+// }
 "use strict";
 exports.__esModule = true;
-function log() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-    }
-    console.log.apply(console, args);
-}
-exports.log = log;
 function warn() {
     var args = [];
     for (var _i = 0; _i < arguments.length; _i++) {
@@ -16,14 +11,9 @@ function warn() {
     console.warn.apply(console, args);
 }
 exports.warn = warn;
-function error() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-    }
-    console.error.apply(console, args);
-}
-exports.error = error;
+// export function error(...args: any[]) {
+//     console.error.apply(console, args)
+// }
 function serverLog() {
     var args = [];
     for (var _i = 0; _i < arguments.length; _i++) {
