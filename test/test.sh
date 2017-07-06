@@ -22,20 +22,29 @@ function codecov() {
   exit $?
 }
 
-function coveralls() {
-  node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
-  exit $?
-}
-
 CMD="$1"
 
-[ -z "$1" ] && CMD="nyc"
+if [ -z "$CIRCLE_PROJECT_REPONAME" ]
+then
+  DEF="nyc"
+else
+  DEF="codecov"
+fi
 
 rm -Rf ~/bin
 rm -Rf ~/coverage
 rm -Rf ~/.nyc_output
 
-tsc -p . 
+[ -z "$1" ] && CMD=$DEF
+if [ "$1" = "nolint" ]
+then
+  CMD=$DEF
+  tsc -p . 
+else
+  tslint -p . 
+  [ $? -eq 0 ] && tsc -p . 
+fi
+
 [ $? -eq 0 ] && tsc --sourceMap test/*.ts 
 [ $? -eq 0 ] && $CMD
 exit $?

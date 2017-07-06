@@ -3,7 +3,7 @@
 // }
 
 export function warn(...args: any[]) {
-    console.warn.apply(console, args)
+    console.warn.apply(console, args);
 }
 
 // export function error(...args: any[]) {
@@ -11,9 +11,9 @@ export function warn(...args: any[]) {
 // }
 
 export function serverLog(...args: any[]) {
-    console.error.apply(console, args)
+    console.error.apply(console, args);
 }
 
 export function serverError(...args: any[]) {
-    console.error.apply(console, args)
+    console.error.apply(console, args);
 }
