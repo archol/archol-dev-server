@@ -70,7 +70,7 @@ export function serveStatic(wwwroot: string, fsroot: string) {
             // next(err);
         }
 
-        function inject(stream: NodeJS.ReadWriteStream) {
+        function inject(stream: any) {
             if (injectTag) {
                 var len = INJECTED_CODE.length + Number.parseInt(res.getHeader('Content-Length') as any);
                 res.setHeader('Content-Length', len.toString());

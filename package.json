@@ -11,7 +11,8 @@
     "run": "node bin/server",
     "dev": "npm run build && npm run run",
     "watch": "tsc -p . -w",
-    "test": "test/test.sh"
+    "test": "test/test.sh",
+    "codecov": "test/test.sh codecov"
   },
   "repository": {
     "type": "git",
