@@ -18,10 +18,22 @@ describe('archol-dev-server-tests', function () {
     it('echo', function (done) {
         httpExpect('/~sample/echo?s=123', '123', done);
     });
+    it('html with injected code - noinject.txt', function (done) {
+        httpExpect('/~samplesite/noinject.txt', '<html><body>ok</body></html>', done);
+    });
     it('html with injected code - index.html', function (done) {
         httpExpect('/~samplesite/index.html', '<html><body>ok<script src="~samplesite/index.js"></script></body></html>', done);
     });
-    it('html with injected code - service fiile index.html', function (done) {
+    it('html with injected code - sub/index.html', function (done) {
+        httpExpect('/~samplesite/sub/index.html', '<html><body>sub<script src="~samplesite/index.js"></script></body></html>', done);
+    });
+    it('html with injected code - HEAD - index.html', function (done) {
+        httpExpect('/~samplesite/index.html', '', done, 'HEAD');
+    });
+    it('html with injected code - POST - index.html', function (done) {
+        httpExpectError('/~samplesite/index.html', 404, done, 'POST');
+    });
+    it('html with injected code - service file index.html', function (done) {
         httpExpect('/~samplefile', '<html><body>ok<script src="~samplesite/index.js"></script></body></html>', done);
     });
     it('html with injected code - nobody.html', function (done) {
@@ -33,8 +45,14 @@ describe('archol-dev-server-tests', function () {
     it('html with injected code - no route', function (done) {
         httpExpectError('', 404, done);
     });
+    it('html with injected code - default redirect', function (done) {
+        httpExpect('/~samplesite/sub', '<html><body>sub<script src="~samplesite/index.js"></script></body></html>', done);
+    });
     it('html with injected code - default', function (done) {
         httpExpect('/~samplesite/', '<html><body>ok<script src="~samplesite/index.js"></script></body></html>', done);
+    });
+    it('html with injected code - sub/default', function (done) {
+        httpExpect('/~samplesite/sub/', '<html><body>sub<script src="~samplesite/index.js"></script></body></html>', done);
     });
     it('try registerPlugin after startServer', function (done) {
         try {
@@ -70,14 +88,16 @@ describe('archol-dev-server-tests', function () {
         }
     });
 });
-function httpExpect(link, expected, callback) {
-    http.get(api.serverLink(link), function (res) {
+function httpExpect(link, expected, callback, method) {
+    var options = api.serverLink(link);
+    options.method = method || 'GET';
+    var req = http.request(options, function (res) {
         if (res.statusCode === 301) {
             var u = url.parse(link);
             var l = res.headers.location;
             link = Array.isArray(l) ? l.join('') : l;
             u.pathname = link;
-            httpExpect(link, expected, callback);
+            httpExpect(link, expected, callback, method);
             return;
         }
         assert.equal(200, res.statusCode);
@@ -97,9 +117,12 @@ function httpExpect(link, expected, callback) {
             callback();
         });
     });
+    req.end();
 }
-function httpExpectError(link, expectedError, callback) {
-    http.get(api.serverLink(link), function (res) {
+function httpExpectError(link, expectedError, callback, method) {
+    var options = api.serverLink(link);
+    options.method = method || 'GET';
+    var req = http.request(options, function (res) {
         if (res.statusCode === 301) {
             var u = url.parse(link);
             var l = res.headers.location;
@@ -111,5 +134,6 @@ function httpExpectError(link, expectedError, callback) {
         assert.equal(expectedError, res.statusCode);
         callback();
     });
+    req.end();
 }
 //# sourceMappingURL=test.js.map

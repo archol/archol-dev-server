@@ -5,6 +5,7 @@ import path = require('path');
 import url = require('url');
 import { warn } from './logger';
 import es = require("event-stream");
+import assert = require('assert');
 var send = require('send');
 
 // from https://github.com/tapio/live-server
@@ -20,30 +21,30 @@ export function appendInjetion(script: string) {
     ].join('');
 }
 export function serveStatic(wwwroot: string, fsroot: string) {
-    if (wwwroot[wwwroot.length-1]!=='/')
-      wwwroot+='/';
     fsroot = path.resolve(fsroot);
-    debugger
     var isFile = fs.statSync(fsroot).isFile();
+    if ((!isFile) && wwwroot[wwwroot.length-1]!=='/')
+      wwwroot+='/';
     return function (req: express.Request, res: express.Response, next: express.NextFunction) {
         debugger
         if (req.method !== "GET" && req.method !== "HEAD") return next();
-        let pathname = url.parse(req.originalUrl).pathname;        
-        if (pathname.substr(0, wwwroot.length) !== wwwroot) return next();
+        let pathname = url.parse(req.originalUrl).pathname;      
+        assert.equal(pathname.substr(0, wwwroot.length), wwwroot);
 
-        pathname = pathname.substr(wwwroot.length);
+        pathname = pathname.substr(wwwroot.length-1);
         let reqpath = isFile ? "" : pathname;
         var hasNoOrigin = !req.headers.origin;
         var injectCandidates = [new RegExp("</body>", "i"), new RegExp("</svg>"), new RegExp("</head>", "i")];
         var injectTag: string = null;
 
         function directory() {  
+            debugger
             res.statusCode = 301;
-            const to=wwwroot + (pathname ? pathname + '/' : '')+ 'index.html';
+            const to=wwwroot + pathname + '/index.html';
             res.setHeader('Location', to);
             res.end('Redirecting to ' + escape(to));
         }
-
+ 
         function file(filepath: string /*, stat*/) {  
             var x = path.extname(filepath).toLocaleLowerCase(), match,
                 possibleExtensions = ["", ".html", ".htm", ".xhtml", ".php", ".svg"];

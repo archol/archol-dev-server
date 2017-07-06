@@ -46,7 +46,14 @@ function startServer(callback) {
 }
 exports.startServer = startServer;
 function serverLink(path) {
-    return ['http://localhost:', config.port, path || '/'].join('');
+    var r = {
+        protocol: 'http:',
+        hostname: 'localhost',
+        port: config.port,
+        method: 'GET',
+        path: path
+    };
+    return r;
 }
 exports.serverLink = serverLink;
 function stopServer(callback) {

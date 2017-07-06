@@ -5,6 +5,7 @@ var path = require("path");
 var url = require("url");
 var logger_1 = require("./logger");
 var es = require("event-stream");
+var assert = require("assert");
 var send = require('send');
 // from https://github.com/tapio/live-server
 var INJECTED_CODE = '';
@@ -18,24 +19,25 @@ function appendInjetion(script) {
 }
 exports.appendInjetion = appendInjetion;
 function serveStatic(wwwroot, fsroot) {
-    if (wwwroot[wwwroot.length - 1] !== '/')
-        wwwroot += '/';
     fsroot = path.resolve(fsroot);
     var isFile = fs.statSync(fsroot).isFile();
+    if ((!isFile) && wwwroot[wwwroot.length - 1] !== '/')
+        wwwroot += '/';
     return function (req, res, next) {
+        debugger;
         if (req.method !== "GET" && req.method !== "HEAD")
             return next();
         var pathname = url.parse(req.originalUrl).pathname;
-        if (pathname.substr(0, wwwroot.length) !== wwwroot)
-            return next();
-        pathname = pathname.substr(wwwroot.length);
+        assert.equal(pathname.substr(0, wwwroot.length), wwwroot);
+        pathname = pathname.substr(wwwroot.length - 1);
         var reqpath = isFile ? "" : pathname;
         var hasNoOrigin = !req.headers.origin;
         var injectCandidates = [new RegExp("</body>", "i"), new RegExp("</svg>"), new RegExp("</head>", "i")];
         var injectTag = null;
         function directory() {
+            debugger;
             res.statusCode = 301;
-            var to = wwwroot + (pathname ? pathname + '/' : '') + 'index.html';
+            var to = wwwroot + pathname + '/index.html';
             res.setHeader('Location', to);
             res.end('Redirecting to ' + escape(to));
         }

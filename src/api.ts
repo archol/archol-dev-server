@@ -60,9 +60,16 @@ export function startServer(callback?: () => void) {
         callback && callback();
     });
 }
- 
+
 export function serverLink(path: string) {
-  return ['http://localhost:', config.port, path || '/'].join('');
+    let r: http.RequestOptions = {
+        protocol: 'http:',
+        hostname: 'localhost',
+        port: config.port,
+        method: 'GET',
+        path,
+    }
+    return r;
 }
 
 export function stopServer(callback?: () => void) {
