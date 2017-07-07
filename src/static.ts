@@ -113,17 +113,18 @@ function fileResponse(data: IStaticData) {
 
 function injections(data: IStaticData, res: express.Response) {
     return (stream: any) => {
-        if (data.injectTag) {
-            const len = INJECTED_CODE.length + Number.parseInt(res.getHeader("Content-Length") as any);
-            res.setHeader("Content-Length", len.toString());
-            const originalPipe = stream.pipe;
-            stream.pipe = (resp: any) => {
-                originalPipe.call(stream,
-                    es.replace(new RegExp(data.injectTag, "i"),
-                        INJECTED_CODE + data.injectTag))
-                    .pipe(resp);
-            };
+        if (!data.injectTag) {
+            return;
         }
+        const len = INJECTED_CODE.length + Number.parseInt(res.getHeader("Content-Length") as any);
+        res.setHeader("Content-Length", len.toString());
+        const originalPipe = stream.pipe;
+        stream.pipe = (resp: any) => {
+            originalPipe.call(stream,
+                es.replace(new RegExp(data.injectTag, "i"),
+                    INJECTED_CODE + data.injectTag))
+                .pipe(resp);
+        };
     };
 }
 

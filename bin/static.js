@@ -92,15 +92,16 @@ function fileResponse(data) {
 }
 function injections(data, res) {
     return function (stream) {
-        if (data.injectTag) {
-            var len = INJECTED_CODE.length + Number.parseInt(res.getHeader("Content-Length"));
-            res.setHeader("Content-Length", len.toString());
-            var originalPipe_1 = stream.pipe;
-            stream.pipe = function (resp) {
-                originalPipe_1.call(stream, es.replace(new RegExp(data.injectTag, "i"), INJECTED_CODE + data.injectTag))
-                    .pipe(resp);
-            };
+        if (!data.injectTag) {
+            return;
         }
+        var len = INJECTED_CODE.length + Number.parseInt(res.getHeader("Content-Length"));
+        res.setHeader("Content-Length", len.toString());
+        var originalPipe = stream.pipe;
+        stream.pipe = function (resp) {
+            originalPipe.call(stream, es.replace(new RegExp(data.injectTag, "i"), INJECTED_CODE + data.injectTag))
+                .pipe(resp);
+        };
     };
 }
 function escape(html) {
