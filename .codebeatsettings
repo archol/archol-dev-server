@@ -1,5 +1,5 @@
 {
-  "TYPESCRIPT": {
+  "TS": {
     "BLOCK_NESTING": [4, 5, 6, 7],
     "ARITY": [5, 6, 7, 8],
   }
