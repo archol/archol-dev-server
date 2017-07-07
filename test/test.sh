@@ -33,7 +33,7 @@ else
   DEF="codecov"
 fi
 
-rm -Rf ~/bin
+rm -Rf ~/dist
 rm -Rf ~/coverage
 rm -Rf ~/.nyc_output
 

@@ -91,7 +91,7 @@ describe("archol-dev-server-tests", () => {
 
 describe("archol-dev-server-tests", () => {
     it("with out package.json", () => {
-        if (api.loadConfig(__dirname + "/../bin")) {
+        if (api.loadConfig(__dirname + "/../dist")) {
             assert.equal("no error", "loadConfig must fail");
         }
     });
