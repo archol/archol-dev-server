@@ -36,6 +36,7 @@
     "@types/node": "^8.0.7",
     "codeclimate-test-reporter": "^0.5.0",
     "codecov": "^2.2.0",
+    "git-hooks": "^1.1.8",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
     "tslint": "^5.4.3",
