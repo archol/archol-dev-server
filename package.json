@@ -4,12 +4,15 @@
   "description": "archol-dev-server",
   "bin": "bin/server.js",
   "main": "bin/api.js",
+  "types": "bin/api.d.ts",
+  "src": "src/",
   "scripts": {
     "build": "tsc -p .",
     "run": "node bin/server",
     "dev": "npm run build && npm run run",
     "watch": "tsc -p . -w",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "test/test.sh",
+    "codecov": "test/test.sh codecov"
   },
   "repository": {
     "type": "git",
@@ -22,14 +25,20 @@
   },
   "homepage": "https://github.com/archol/archol-dev-server#readme",
   "dependencies": {
-    "express": "^4.15.3"
+    "event-stream": "^3.3.4",
+    "express": "^4.15.3",
+    "send": "^0.15.3"
   },
   "devDependencies": {
+    "@types/event-stream": "^3.3.31",
     "@types/express": "^4.0.36",
+    "@types/mocha": "^2.2.41",
     "@types/node": "^8.0.7",
+    "codeclimate-test-reporter": "^0.5.0",
     "codecov": "^2.2.0",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
+    "tslint": "^5.4.3",
     "typescript": "^2.4.1"
   },
   "archol-dev-server": {

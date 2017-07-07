@@ -1,9 +1,10 @@
 
-import { loadConfig, loadPlugins, startServer } from './api';
+import { loadConfig, startServer } from "./api";
 
 setTimeout(() => {
     if (loadConfig(process.cwd())) {
-        loadPlugins();
-        startServer();
+        startServer(() => {
+            //
+        });
     }
 }, 500);

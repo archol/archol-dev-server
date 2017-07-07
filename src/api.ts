@@ -1,82 +1,101 @@
 
-import express = require('express');
-import http = require('http');
-import fs = require('fs');
-import path = require('path');
-import { defaultPlugins } from './plugins';
+import express = require("express");
+import http = require("http");
+import fs = require("fs");
+import path = require("path");
+import { serverError, serverLog } from "./logger";
+import { defaultPlugins } from "./plugins";
+import { appendInjetion, serveStatic } from "./static";
 
 const app = express();
 const server = http.createServer(app);
 let listening = false;
 
-export type Plugin = {
+export type Middleware = (req: express.Request, res: express.Response, next: express.NextFunction) => any;
+export type StaticFolder = string;
+
+export interface IPlugin {
     handlers: {
-        [path: string]: (req: express.Request, res: express.Response, next: express.NextFunction) => any
-    }
-};
-const plugins: Array<Plugin> = defaultPlugins;
+        [path: string]: Middleware | StaticFolder,
+    };
+    injections: string[];
+}
+
 let config: {
     port: number
-    plugins: string[]
+    plugins: string[],
 };
 
-export function registerPlugin(plugin: Plugin) {
-    if (listening)
-        throw new Error('Server yet started');
-    plugins.push(plugin);    
-}
+defaultPlugins.forEach(registerPlugin);
 
-export function loadPlugins() {
-    plugins.forEach(p => {
-        loadPlugin(p);
-    })
-}
-
-export function loadPlugin(plugin: Plugin) {
-    initHandlers();
-    function initHandlers() {
-        Object.keys(plugin.handlers).forEach(path => {
-            app.use(path, plugin.handlers[path]);
-        })
+export function registerPlugin(plugin: IPlugin) {
+    if (listening) {
+        throw new Error("Server yet started");
     }
+    loadPlugin(plugin);
 }
 
-export function startServer(callback?: () => void) {
-    server.listen(config.port, () => {
-        listening = true;
-        console.log('Listening on %d', server.address().port);
-        callback && callback();
+export function loadPlugin(plugin: IPlugin) {
+    Object.keys(plugin.handlers).forEach((urlpath) => {
+        const h = plugin.handlers[urlpath];
+        if (typeof h === "function") {
+            app.use(urlpath, h);
+        }
+        if (typeof h === "string") {
+            app.use(urlpath, serveStatic(urlpath, h));
+        }
+    });
+    plugin.injections.forEach((script) => {
+        appendInjetion(script);
     });
 }
 
-export function stopServer(callback?: () => void) {
+export function startServer(callback: () => void) {
+    server.listen(config.port, () => {
+        listening = true;
+        serverLog("Listening on http://localhost:", server.address().port, "/");
+        callback();
+    });
+}
+
+export function serverLink(urlpath: string) {
+    const r: http.RequestOptions = {
+        hostname: "localhost",
+        method: "GET",
+        path: urlpath,
+        port: config.port,
+        protocol: "http:",
+    };
+    return r;
+}
+
+export function stopServer(callback: () => void) {
     server.close(() => {
         listening = false;
-        callback && callback();
+        callback();
     });
 }
 
 export function loadConfig(dir: string) {
     dir = path.resolve(dir);
-    let packageJson = path.join(dir, 'package.json')
+    const packageJson = path.join(dir, "package.json");
     if (!fs.existsSync(packageJson)) {
-        console.error(packageJson + ' not found in current directory');
+        serverError(packageJson + " not found in current directory");
         return false;
     }
-    let text = fs.readFileSync(packageJson, 'utf-8');
-    let json = JSON.parse(text);
-    config = json['archol-dev-server'];
+    const text = fs.readFileSync(packageJson, "utf-8");
+    const json = JSON.parse(text);
+    config = json["archol-dev-server"];
     if (!config) {
-        console.error('archol-dev-server not found in ' + packageJson);
+        serverError("archol-dev-server not found in " + packageJson);
         return false;
     }
     if (!(config.plugins && Array.isArray(config.plugins))) {
-        console.error('archol-dev-server.plugins must be an array in ' + packageJson);
+        serverError("archol-dev-server.plugins must be an array in " + packageJson);
         return false;
     }
-    config.plugins.forEach(function (p) {
+    config.plugins.forEach((p) => {
         require(path.resolve(path.join(dir, p)));
     });
     return true;
 }
-
