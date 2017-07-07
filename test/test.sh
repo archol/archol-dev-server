@@ -20,6 +20,7 @@ function codecov() {
   [ $? -eq 0 ] && node_modules/.bin/nyc report --reporter=json
   [ $? -eq 0 ] && node_modules/.bin/codecov -f coverage/*.json -t "$CODECOV_TOKEN"
   [ $? -eq 0 ] && node_modules/.bin/nyc report --reporter=lcov
+  [ $? -eq 0 ] && node_modules/.bin/codeclimate-test-reporter < coverage/lcov.info
   exit $?
 }
 
