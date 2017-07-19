@@ -3,7 +3,7 @@ import express = require("express");
 import http = require("http");
 import fs = require("fs");
 import path = require("path");
-import { serverError, serverLog } from "./logger";
+import { serverOnlyLog } from "./logger";
 import { defaultPlugins } from "./plugins";
 import { appendInjetion, serveStatic } from "./static";
 
@@ -14,11 +14,20 @@ let listening = false;
 export type Middleware = (req: express.Request, res: express.Response, next: express.NextFunction) => any;
 export type StaticFolder = string;
 
+export interface ITransformerSettings {
+    project_path: string;
+}
+
+export type Transformer<T extends ITransformerSettings> = (settings: T) => {
+    stop(): void;
+};
+
 export interface IPlugin {
     handlers: {
         [path: string]: Middleware | StaticFolder,
     };
     injections: string[];
+    transformers: { [name: string]: Transformer<any> };
 }
 
 let config: {
@@ -53,7 +62,10 @@ export function loadPlugin(plugin: IPlugin) {
 export function startServer(callback: () => void) {
     server.listen(config.port, () => {
         listening = true;
-        serverLog("Listening on http://localhost:", server.address().port, "/");
+        serverOnlyLog({
+            kind: "hint",
+            message: "Listening on http://localhost: " + server.address().port + "/",
+        });
         callback();
     });
 }
@@ -80,18 +92,27 @@ export function loadConfig(dir: string) {
     dir = path.resolve(dir);
     const packageJson = path.join(dir, "package.json");
     if (!fs.existsSync(packageJson)) {
-        serverError(packageJson + " not found in current directory");
+        serverOnlyLog({
+            kind: "error",
+            message: packageJson + " not found in current directory",
+        });
         return false;
     }
     const text = fs.readFileSync(packageJson, "utf-8");
     const json = JSON.parse(text);
     config = json["archol-dev-server"];
     if (!config) {
-        serverError("archol-dev-server not found in " + packageJson);
+        serverOnlyLog({
+            kind: "error",
+            message: "archol-dev-server not found in " + packageJson,
+        });
         return false;
     }
     if (!(config.plugins && Array.isArray(config.plugins))) {
-        serverError("archol-dev-server.plugins must be an array in " + packageJson);
+        serverOnlyLog({
+            kind: "error",
+            message: "archol-dev-server.plugins must be an array in " + packageJson,
+        });
         return false;
     }
     config.plugins.forEach((p) => {

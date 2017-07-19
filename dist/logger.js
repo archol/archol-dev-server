@@ -1,33 +1,51 @@
 "use strict";
-// export function log(...args: any[]) {
-//     console.log.apply(console, args)
-// }
 exports.__esModule = true;
-function warn() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
+var logListenners = [];
+function log(data) {
+    if (logListenners.length) {
+        logListenners.forEach(function (fn) { return fn(data); });
     }
-    console.warn.apply(console, args);
-}
-exports.warn = warn;
-// export function error(...args: any[]) {
-//     console.error.apply(console, args)
-// }
-function serverLog() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
+    else {
+        throw new Error("has no logListenners");
     }
-    console.error.apply(console, args);
 }
-exports.serverLog = serverLog;
-function serverError() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
+exports.log = log;
+function addLogListenner(fn) {
+    var i = logListenners.indexOf(fn);
+    if (i === -1) {
+        logListenners.push(fn);
     }
-    console.error.apply(console, args);
 }
-exports.serverError = serverError;
+exports.addLogListenner = addLogListenner;
+function removeLogListenner(fn) {
+    var i = logListenners.indexOf(fn);
+    if (i >= 0) {
+        logListenners.splice(i, 1);
+    }
+}
+exports.removeLogListenner = removeLogListenner;
+var serverOnlyLogListenners = [];
+function serverOnlyLog(data) {
+    if (serverOnlyLogListenners.length) {
+        serverOnlyLogListenners.forEach(function (fn) { return fn(data); });
+    }
+    else {
+        throw new Error("has no logListenners");
+    }
+}
+exports.serverOnlyLog = serverOnlyLog;
+function addServerOnlyLogListenner(fn) {
+    var i = serverOnlyLogListenners.indexOf(fn);
+    if (i === -1) {
+        serverOnlyLogListenners.push(fn);
+    }
+}
+exports.addServerOnlyLogListenner = addServerOnlyLogListenner;
+function removeServerOnlyLogListenner(fn) {
+    var i = serverOnlyLogListenners.indexOf(fn);
+    if (i >= 0) {
+        serverOnlyLogListenners.splice(i, 1);
+    }
+}
+exports.removeServerOnlyLogListenner = removeServerOnlyLogListenner;
 //# sourceMappingURL=logger.js.map

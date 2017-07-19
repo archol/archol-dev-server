@@ -33,6 +33,7 @@ else
   DEF="codecov"
 fi
 
+rm -Rf ~/test/*.js
 rm -Rf ~/dist
 rm -Rf ~/coverage
 rm -Rf ~/.nyc_output

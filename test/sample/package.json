@@ -12,6 +12,15 @@
     "port": 54321,
     "plugins": [
       "./samplePlugin"
-    ]
+    ],
+    "watchers": [
+        {
+            "glob": "static/"
+        }
+    ],
+    "typescript": {
+       "static": "static/**/*.ts",
+       "scripts": "(!static)/**/*.ts"
+    }
   }
 }

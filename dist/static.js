@@ -3,7 +3,6 @@ exports.__esModule = true;
 var fs = require("fs");
 var path = require("path");
 var url = require("url");
-var logger_1 = require("./logger");
 var es = require("event-stream");
 var assert = require("assert");
 // tslint:disable-next-line:no-var-requires
@@ -84,9 +83,6 @@ function fileResponse(data) {
                 data.injectTag = match[0];
                 break;
             }
-        }
-        if (data.injectTag === null) {
-            logger_1.warn("Failed to inject refresh script!", "Couldn't find any of the tags ", injectCandidates, "from", filepath);
         }
     };
 }

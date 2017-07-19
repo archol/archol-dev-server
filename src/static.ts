@@ -3,7 +3,7 @@ import http = require("http");
 import fs = require("fs");
 import path = require("path");
 import url = require("url");
-import { warn } from "./logger";
+import { log } from "./logger";
 import es = require("event-stream");
 import assert = require("assert");
 // tslint:disable-next-line:no-var-requires
@@ -103,10 +103,6 @@ function fileResponse(data: IStaticData) {
                 data.injectTag = match[0];
                 break;
             }
-        }
-        if (data.injectTag === null) {
-            warn("Failed to inject refresh script!",
-                "Couldn't find any of the tags ", injectCandidates, "from", filepath);
         }
     };
 }
