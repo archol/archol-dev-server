@@ -4,10 +4,15 @@
         "tslint:recommended"
     ],
     "jsRules": {},
-    "rules": {        
+    "rules": {
         "indent": [
             "error",
             2
+        ],
+        "quotemark": [
+            true, 
+            "single", 
+            "avoid-escape"
         ]
     },
     "rulesDirectory": []

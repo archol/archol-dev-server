@@ -34,6 +34,7 @@ else
 fi
 
 rm -Rf ~/test/*.js
+rm -Rf ~/test.temp
 rm -Rf ~/dist
 rm -Rf ~/coverage
 rm -Rf ~/.nyc_output
@@ -48,6 +49,6 @@ else
   [ $? -eq 0 ] && tsc -p . 
 fi
 
-[ $? -eq 0 ] && tsc --sourceMap test/*.ts 
+[ $? -eq 0 ] && tsc --sourceMap test/*.test.ts 
 [ $? -eq 0 ] && $CMD
 exit $?

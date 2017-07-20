@@ -1,6 +1,6 @@
 
-import { loadConfig, startServer } from "./api";
-import { addLogListenner, addServerOnlyLogListenner } from "./logger";
+import { loadConfig, startServer } from './api';
+import { addLogListenner, addServerOnlyLogListenner } from './logger';
 
 addLogListenner((data) => {
     // tslint:disable-next-line:no-console

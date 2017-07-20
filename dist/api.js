@@ -14,7 +14,7 @@ var config;
 plugins_1.defaultPlugins.forEach(registerPlugin);
 function registerPlugin(plugin) {
     if (listening) {
-        throw new Error("Server yet started");
+        throw new Error('Server yet started');
     }
     loadPlugin(plugin);
 }
@@ -22,10 +22,10 @@ exports.registerPlugin = registerPlugin;
 function loadPlugin(plugin) {
     Object.keys(plugin.handlers).forEach(function (urlpath) {
         var h = plugin.handlers[urlpath];
-        if (typeof h === "function") {
+        if (typeof h === 'function') {
             app.use(urlpath, h);
         }
-        if (typeof h === "string") {
+        if (typeof h === 'string') {
             app.use(urlpath, static_1.serveStatic(urlpath, h));
         }
     });
@@ -38,8 +38,8 @@ function startServer(callback) {
     server.listen(config.port, function () {
         listening = true;
         logger_1.serverOnlyLog({
-            kind: "hint",
-            message: "Listening on http://localhost: " + server.address().port + "/"
+            kind: 'hint',
+            message: 'Listening on http://localhost: ' + server.address().port + '/'
         });
         callback();
     });
@@ -47,11 +47,11 @@ function startServer(callback) {
 exports.startServer = startServer;
 function serverLink(urlpath) {
     var r = {
-        hostname: "localhost",
-        method: "GET",
+        hostname: 'localhost',
+        method: 'GET',
         path: urlpath,
         port: config.port,
-        protocol: "http:"
+        protocol: 'http:'
     };
     return r;
 }
@@ -65,35 +65,52 @@ function stopServer(callback) {
 exports.stopServer = stopServer;
 function loadConfig(dir) {
     dir = path.resolve(dir);
-    var packageJson = path.join(dir, "package.json");
+    var packageJson = path.join(dir, 'package.json');
     if (!fs.existsSync(packageJson)) {
         logger_1.serverOnlyLog({
-            kind: "error",
-            message: packageJson + " not found in current directory"
+            kind: 'error',
+            message: packageJson + ' not found in current directory'
         });
         return false;
     }
-    var text = fs.readFileSync(packageJson, "utf-8");
+    var text = fs.readFileSync(packageJson, 'utf-8');
     var json = JSON.parse(text);
-    config = json["archol-dev-server"];
+    config = json['archol-dev-server'];
     if (!config) {
         logger_1.serverOnlyLog({
-            kind: "error",
-            message: "archol-dev-server not found in " + packageJson
+            kind: 'error',
+            message: 'archol-dev-server not found in ' + packageJson
         });
         return false;
     }
-    if (!(config.plugins && Array.isArray(config.plugins))) {
-        logger_1.serverOnlyLog({
-            kind: "error",
-            message: "archol-dev-server.plugins must be an array in " + packageJson
-        });
-        return false;
+    if (typeof config === 'object') {
+        config.dir = dir;
     }
-    config.plugins.forEach(function (p) {
-        require(path.resolve(path.join(dir, p)));
-    });
-    return true;
+    return loadPluginsFromConfig()
+        && loadProjectionsFromConfig();
+    function loadPluginsFromConfig() {
+        if (!(config.plugins && Array.isArray(config.plugins))) {
+            logger_1.serverOnlyLog({
+                kind: 'error',
+                message: 'archol-dev-server.plugins must be an array in ' + packageJson
+            });
+            return false;
+        }
+        config.plugins.forEach(function (p) {
+            require(path.resolve(path.join(dir, p)));
+        });
+        return true;
+    }
+    function loadProjectionsFromConfig() {
+        if (!(config.projections && Array.isArray(config.projections))) {
+            logger_1.serverOnlyLog({
+                kind: 'error',
+                message: 'archol-dev-server.plugins must be an array in ' + packageJson
+            });
+            return false;
+        }
+        return true;
+    }
 }
 exports.loadConfig = loadConfig;
 //# sourceMappingURL=api.js.map

@@ -5,7 +5,7 @@ export interface ILogData {
     file?: string;
     line?: number;
     character?: number;
-    kind: "hint" | "warning" | "error" | "fatal";
+    kind: 'hint' | 'warning' | 'error' | 'fatal';
 }
 
 export type LogHook = (data: ILogData) => void;
@@ -15,7 +15,7 @@ export function log(data: ILogData) {
     if (logListenners.length) {
         logListenners.forEach((fn) => fn(data));
     } else {
-        throw new Error("has no logListenners");
+        throw new Error('has no logListenners');
     }
 }
 export function addLogListenner(fn: LogHook) {
@@ -36,7 +36,7 @@ export function serverOnlyLog(data: ILogData) {
     if (serverOnlyLogListenners.length) {
         serverOnlyLogListenners.forEach((fn) => fn(data));
     } else {
-        throw new Error("has no logListenners");
+        throw new Error('has no logListenners');
     }
 }
 export function addServerOnlyLogListenner(fn: LogHook) {

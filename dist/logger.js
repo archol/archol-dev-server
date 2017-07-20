@@ -6,7 +6,7 @@ function log(data) {
         logListenners.forEach(function (fn) { return fn(data); });
     }
     else {
-        throw new Error("has no logListenners");
+        throw new Error('has no logListenners');
     }
 }
 exports.log = log;
@@ -30,7 +30,7 @@ function serverOnlyLog(data) {
         serverOnlyLogListenners.forEach(function (fn) { return fn(data); });
     }
     else {
-        throw new Error("has no logListenners");
+        throw new Error('has no logListenners');
     }
 }
 exports.serverOnlyLog = serverOnlyLog;
