@@ -9,9 +9,17 @@
   "author": "",
   "license": "ISC",
   "archol-dev-server": {
+    "home": "../test.temp",
     "port": 54321,
     "plugins": [
       "./samplePlugin"
+    ],
+    "projections": [
+      {
+        "from": "/ts1",
+        "to": "/ts1",
+        "transformer": "typescript"
+      }
     ]
   }
 }

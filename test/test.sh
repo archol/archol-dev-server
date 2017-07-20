@@ -20,6 +20,7 @@ function codecov() {
   [ $? -eq 0 ] && node_modules/.bin/nyc report --reporter=json
   [ $? -eq 0 ] && node_modules/.bin/codecov -f coverage/*.json -t "$CODECOV_TOKEN"
   [ $? -eq 0 ] && node_modules/.bin/nyc report --reporter=lcov
+  [ $? -eq 0 ] && node_modules/.bin/codeclimate-test-reporter < coverage/lcov.info
   exit $?
 }
 
@@ -32,7 +33,9 @@ else
   DEF="codecov"
 fi
 
-rm -Rf ~/bin
+rm -Rf ~/test/*.js
+rm -Rf ~/test.temp
+rm -Rf ~/dist
 rm -Rf ~/coverage
 rm -Rf ~/.nyc_output
 
@@ -46,6 +49,6 @@ else
   [ $? -eq 0 ] && tsc -p . 
 fi
 
-[ $? -eq 0 ] && tsc --sourceMap test/*.ts 
+[ $? -eq 0 ] && tsc --sourceMap test/*.test.ts 
 [ $? -eq 0 ] && $CMD
 exit $?

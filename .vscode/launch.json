@@ -8,10 +8,10 @@
             "type": "node",
             "request": "launch",
             "name": "start server",
-            "program": "${workspaceRoot}/bin/server.js",
+            "program": "${workspaceRoot}/dist/server.js",
             "sourceMaps": true,
             "outFiles": [
-                "${workspaceRoot}/bin/server.js"
+                "${workspaceRoot}/dist/server.js"
             ]
         },
         {

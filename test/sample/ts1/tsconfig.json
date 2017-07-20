@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "outDir": "../../../test.temp/ts1" 
+  }
+}
